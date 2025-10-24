@@ -62,8 +62,8 @@
   - Verify model has approximately 2M parameters
   - _Requirements: 1.1, 1.2, 1.3, 1.8_
 
-- [ ] 4. Implement MCTS engine
-- [ ] 4.1 Create MCTSNode class
+- [x] 4. Implement MCTS engine
+- [x] 4.1 Create MCTSNode class
   - Implement node initialization with position, parent, prior probability, and move
   - Implement get_value() calculating mean action value Q(s,a)
   - Implement get_ucb_score() using UCB1 formula with c_puct parameter
@@ -71,7 +71,7 @@
   - Write unit tests for node operations
   - _Requirements: 4.1_
 
-- [ ] 4.2 Create MCTS search implementation
+- [x] 4.2 Create MCTS search implementation
   - Implement search() method running simulations and returning policy
   - Implement _select_child() choosing child with highest UCB score
   - Implement _expand_node() adding children for all legal moves

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Task Completion Tracker",
+  "description": "Monitors tasks.md for completed tasks and automatically moves on to the next task",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "tasks.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A task has been completed in tasks.md. Please review the file to identify which task was just completed and move on to the next task in the list. If all tasks are complete, provide a summary of what was accomplished."
+  }
+}
