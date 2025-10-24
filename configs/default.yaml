@@ -1,0 +1,73 @@
+# Default Configuration for Chess Engine Training
+# This configuration provides standard settings for training a king-pawn endgame engine
+
+# Neural Network Architecture
+num_res_blocks: 3
+num_filters: 256
+
+# Training Hyperparameters (Requirements 7.1-7.6)
+batch_size: 512
+learning_rate: 0.001
+weight_decay: 0.0001
+target_games: 100000
+evaluation_frequency: 1000
+
+# MCTS Configuration (Requirements 7.4-7.5)
+mcts_simulations: 400
+c_puct: 1.0
+
+# Self-Play Configuration
+games_per_iteration: 100
+training_steps_per_iteration: 100
+num_workers: 4
+temperature: 1.0
+
+# Training Schedule (Requirements 7.8-7.10)
+phase_1_games: 25000  # High exploration phase
+phase_2_games: 75000  # Balanced exploration/exploitation
+phase_3_games: 100000 # Low exploration for fine-tuning
+
+# Curriculum Learning
+curriculum_level: 0
+curriculum_schedule:
+  0: 0      # 0-25K games: simple positions
+  25000: 1  # 25K-75K games: medium positions  
+  75000: 2  # 75K+ games: complex positions
+
+# Buffer and Storage
+buffer_size: 100000
+checkpoint_frequency: 5000
+
+# Hardware and Performance
+device: cuda
+mixed_precision: false
+num_data_workers: 4
+pin_memory: true
+
+# Optimizer Configuration
+optimizer: adam
+lr_scheduler: step
+lr_step_size: 25000
+lr_gamma: 0.1
+gradient_clip_norm: 1.0
+
+# Evaluation Configuration
+eval_games: 100
+eval_mcts_simulations: 400
+benchmark_opponents:
+  - random
+  - minimax_d3
+  - minimax_d5
+  - stockfish
+
+# Logging and Monitoring
+log_frequency: 100
+tensorboard_log_dir: logs/tensorboard
+checkpoint_dir: checkpoints
+
+# Reproducibility (Requirement 14.2)
+random_seed: 42
+
+# File Paths
+config_dir: configs
+data_dir: data

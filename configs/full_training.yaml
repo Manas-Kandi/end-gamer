@@ -1,0 +1,74 @@
+# Full Training Configuration for Chess Engine
+# Optimized settings for complete 100K game training run
+
+# Neural Network Architecture (full capacity)
+num_res_blocks: 4
+num_filters: 512
+
+# Training Hyperparameters (optimized for full training)
+batch_size: 1024
+learning_rate: 0.0005
+weight_decay: 0.0001
+target_games: 100000
+evaluation_frequency: 2000
+
+# MCTS Configuration (high quality search)
+mcts_simulations: 800
+c_puct: 1.0
+
+# Self-Play Configuration (larger batches for efficiency)
+games_per_iteration: 200
+training_steps_per_iteration: 200
+num_workers: 8
+temperature: 1.0
+
+# Training Schedule (standard phases)
+phase_1_games: 25000  # High exploration phase
+phase_2_games: 75000  # Balanced exploration/exploitation
+phase_3_games: 100000 # Low exploration for fine-tuning
+
+# Curriculum Learning
+curriculum_level: 0
+curriculum_schedule:
+  0: 0      # 0-25K games: simple positions
+  25000: 1  # 25K-75K games: medium positions
+  75000: 2  # 75K+ games: complex positions
+
+# Buffer and Storage (large capacity)
+buffer_size: 200000
+checkpoint_frequency: 10000
+
+# Hardware and Performance (optimized for high-end hardware)
+device: cuda
+mixed_precision: true
+num_data_workers: 8
+pin_memory: true
+
+# Optimizer Configuration (conservative for stability)
+optimizer: adam
+lr_scheduler: step
+lr_step_size: 30000
+lr_gamma: 0.1
+gradient_clip_norm: 1.0
+
+# Evaluation Configuration (comprehensive)
+eval_games: 200
+eval_mcts_simulations: 800
+benchmark_opponents:
+  - random
+  - minimax_d3
+  - minimax_d5
+  - minimax_d7
+  - stockfish
+
+# Logging and Monitoring
+log_frequency: 50
+tensorboard_log_dir: logs/tensorboard_full
+checkpoint_dir: checkpoints_full
+
+# Reproducibility
+random_seed: 42
+
+# File Paths
+config_dir: configs
+data_dir: data_full

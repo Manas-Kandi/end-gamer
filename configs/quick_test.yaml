@@ -1,0 +1,71 @@
+# Quick Test Configuration for Chess Engine
+# Reduced parameters for rapid testing and development
+
+# Neural Network Architecture (smaller for faster training)
+num_res_blocks: 2
+num_filters: 128
+
+# Training Hyperparameters (reduced for quick testing)
+batch_size: 64
+learning_rate: 0.002
+weight_decay: 0.0001
+target_games: 1000  # Much smaller for quick testing
+evaluation_frequency: 100
+
+# MCTS Configuration (reduced simulations for speed)
+mcts_simulations: 50
+c_puct: 1.0
+
+# Self-Play Configuration (smaller batches)
+games_per_iteration: 10
+training_steps_per_iteration: 10
+num_workers: 2
+temperature: 1.0
+
+# Training Schedule (compressed phases)
+phase_1_games: 300   # High exploration phase
+phase_2_games: 700   # Balanced exploration/exploitation
+phase_3_games: 1000  # Low exploration for fine-tuning
+
+# Curriculum Learning (faster progression)
+curriculum_level: 0
+curriculum_schedule:
+  0: 0    # 0-300 games: simple positions
+  300: 1  # 300-700 games: medium positions
+  700: 2  # 700+ games: complex positions
+
+# Buffer and Storage (smaller for testing)
+buffer_size: 5000
+checkpoint_frequency: 200
+
+# Hardware and Performance
+device: cuda
+mixed_precision: false
+num_data_workers: 2
+pin_memory: true
+
+# Optimizer Configuration
+optimizer: adam
+lr_scheduler: step
+lr_step_size: 500
+lr_gamma: 0.5
+gradient_clip_norm: 1.0
+
+# Evaluation Configuration (reduced for speed)
+eval_games: 20
+eval_mcts_simulations: 50
+benchmark_opponents:
+  - random
+  - minimax_d3
+
+# Logging and Monitoring (more frequent for testing)
+log_frequency: 10
+tensorboard_log_dir: logs/tensorboard_test
+checkpoint_dir: checkpoints_test
+
+# Reproducibility
+random_seed: 42
+
+# File Paths
+config_dir: configs
+data_dir: data_test

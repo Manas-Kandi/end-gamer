@@ -82,8 +82,8 @@
   - Write unit tests for each MCTS phase (selection, expansion, evaluation, backpropagation)
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-- [ ] 5. Implement configuration management
-- [ ] 5.1 Create Config dataclass
+- [x] 5. Implement configuration management
+- [x] 5.1 Create Config dataclass
   - Define all hyperparameters (network, MCTS, training, self-play, schedule)
   - Implement from_yaml() class method for loading configuration
   - Implement to_yaml() method for saving configuration
@@ -91,20 +91,20 @@
   - Write unit tests for config loading and saving
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.11, 14.1, 14.6_
 
-- [ ] 5.2 Create example configuration files
+- [x] 5.2 Create example configuration files
   - Create config/default.yaml with standard training configuration
   - Create config/quick_test.yaml for rapid testing with reduced parameters
   - Create config/full_training.yaml for 100K game training run
   - _Requirements: 14.7_
 
 - [ ] 6. Implement training data structures
-- [ ] 6.1 Create TrainingExample dataclass
+- [x] 6.1 Create TrainingExample dataclass
   - Define fields for position (12,8,8), policy (4096,), and value (float)
   - Implement serialization methods for efficient storage
   - Write unit tests for data structure
   - _Requirements: 3.2_
 
-- [ ] 6.2 Create ReplayBuffer class
+- [x] 6.2 Create ReplayBuffer class
   - Implement buffer initialization with max_size parameter
   - Implement add_examples() adding training examples to buffer
   - Implement sample_batch() randomly sampling batch for training
