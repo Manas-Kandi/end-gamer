@@ -34,26 +34,26 @@
   - Write unit tests for position generation and validation
   - _Requirements: 5.1, 5.3, 5.6_
 
-- [ ] 3. Implement neural network architecture
-- [ ] 3.1 Create ResidualBlock module
+- [x] 3. Implement neural network architecture
+- [x] 3.1 Create ResidualBlock module
   - Implement ResidualBlock with two 3x3 convolutions, BatchNorm, and skip connection
   - Implement forward pass with ReLU activations
   - Write unit tests verifying output shape and gradient flow
   - _Requirements: 1.4_
 
-- [ ] 3.2 Create PolicyHead module
+- [x] 3.2 Create PolicyHead module
   - Implement 1x1 convolution with 2 filters and BatchNorm
   - Implement fully connected layer outputting 4096 logits
   - Write unit tests verifying output shape
   - _Requirements: 1.5, 1.6_
 
-- [ ] 3.3 Create ValueHead module
+- [x] 3.3 Create ValueHead module
   - Implement 1x1 convolution with 1 filter and BatchNorm
   - Implement fully connected layers (64 -> 256 -> 1) with ReLU and tanh
   - Write unit tests verifying output range [-1, 1]
   - _Requirements: 1.5, 1.7_
 
-- [ ] 3.4 Create ChessNet main network
+- [x] 3.4 Create ChessNet main network
   - Implement input convolution layer (12 -> 256 filters, 3x3, BatchNorm, ReLU)
   - Integrate 3 ResidualBlock modules
   - Integrate PolicyHead and ValueHead
