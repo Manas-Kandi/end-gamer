@@ -8,8 +8,8 @@
   - Create README.md with project overview and installation instructions
   - _Requirements: 10.8, 16.1_
 
-- [ ] 2. Implement chess environment module
-- [ ] 2.1 Create Position class with board representation
+- [x] 2. Implement chess environment module
+- [x] 2.1 Create Position class with board representation
   - Implement Position class wrapping python-chess Board
   - Implement to_tensor() method converting board to 8x8x12 numpy array
   - Implement get_legal_moves() returning list of legal moves
@@ -20,14 +20,14 @@
   - Write unit tests for Position class methods
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 2.2 Create MoveEncoder class for move encoding/decoding
+- [x] 2.2 Create MoveEncoder class for move encoding/decoding
   - Implement encode_move() converting chess.Move to integer index [0, 4095]
   - Implement decode_move() converting integer index to chess.Move
   - Implement get_move_mask() returning binary mask for legal moves
   - Write unit tests for move encoding/decoding and masking
   - _Requirements: 2.4, 2.5, 2.6_
 
-- [ ] 2.3 Create PositionGenerator for king-pawn endgame positions
+- [x] 2.3 Create PositionGenerator for king-pawn endgame positions
   - Implement generate_position() creating random legal king-pawn positions
   - Implement is_valid_kp_endgame() validating position constraints
   - Implement curriculum learning levels (0: simple, 1: medium, 2: complex)
