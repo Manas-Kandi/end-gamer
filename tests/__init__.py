@@ -1,0 +1,1 @@
+"""Test package for chess engine KP endgame."""
