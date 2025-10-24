@@ -112,8 +112,8 @@
   - Write unit tests for buffer operations and size limits
   - _Requirements: 12.1, 12.6, 12.8_
 
-- [ ] 7. Implement self-play generation
-- [ ] 7.1 Create SelfPlayWorker class
+- [x] 7. Implement self-play generation
+- [x] 7.1 Create SelfPlayWorker class
   - Implement play_game() generating one complete self-play game
   - Implement _sample_move() sampling moves from policy with temperature
   - Integrate MCTS for move selection
@@ -123,7 +123,7 @@
   - Write unit tests for game generation
   - _Requirements: 3.1, 3.2, 5.1, 5.4_
 
-- [ ] 7.2 Implement parallel self-play
+- [x] 7.2 Implement parallel self-play
   - Create parallel game generation using multiprocessing.Pool
   - Implement worker process management
   - Implement result aggregation from multiple workers
