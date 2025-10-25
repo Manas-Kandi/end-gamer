@@ -1,6 +1,7 @@
 """Self-play worker for generating training games."""
 
 import random
+import logging
 from typing import List, Optional
 import numpy as np
 import chess
@@ -11,6 +12,9 @@ from ..chess_env.position import Position
 from ..chess_env.position_generator import PositionGenerator
 from ..chess_env.move_encoder import MoveEncoder
 from ..config.config import Config
+from ..exceptions import SelfPlayError, SearchTimeoutError, ChessError
+
+logger = logging.getLogger(__name__)
 
 
 class SelfPlayWorker:
@@ -48,6 +52,44 @@ class SelfPlayWorker:
         if config.random_seed is not None:
             random.seed(config.random_seed)
             np.random.seed(config.random_seed)
+    
+    def play_game_with_retry(self, temperature: Optional[float] = None, 
+                            max_retries: int = 3) -> List[TrainingExample]:
+        """Play game with retry logic on failure.
+        
+        Args:
+            temperature: Temperature for move sampling
+            max_retries: Maximum number of retry attempts
+            
+        Returns:
+            List of training examples from the game
+            
+        Raises:
+            SelfPlayError: If all retry attempts fail
+        """
+        last_error = None
+        
+        for attempt in range(max_retries):
+            try:
+                return self.play_game(temperature)
+            except SearchTimeoutError as e:
+                logger.warning(f"Game attempt {attempt + 1} timed out: {e}")
+                last_error = e
+                # Continue to retry
+            except ChessError as e:
+                logger.warning(f"Chess error in game attempt {attempt + 1}: {e}")
+                last_error = e
+                # Continue to retry
+            except Exception as e:
+                logger.error(f"Unexpected error in game attempt {attempt + 1}: {e}")
+                last_error = e
+                # Continue to retry
+        
+        # All retries failed
+        raise SelfPlayError(
+            game_number=-1,
+            reason=f"Failed after {max_retries} attempts. Last error: {last_error}"
+        )
     
     def play_game(self, temperature: Optional[float] = None) -> List[TrainingExample]:
         """Play one complete self-play game and return training examples.

@@ -5,10 +5,15 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import chess
+import time
+import logging
 
 from .mcts_node import MCTSNode
 from ..chess_env.position import Position
 from ..chess_env.move_encoder import MoveEncoder
+from ..exceptions import SearchTimeoutError
+
+logger = logging.getLogger(__name__)
 
 
 class MCTS:
@@ -20,7 +25,7 @@ class MCTS:
     """
     
     def __init__(self, neural_net: torch.nn.Module, num_simulations: int = 400,
-                 c_puct: float = 1.0, device: str = 'cuda'):
+                 c_puct: float = 1.0, device: str = 'cuda', timeout: Optional[float] = None):
         """Initialize MCTS.
         
         Args:
@@ -28,24 +33,32 @@ class MCTS:
             num_simulations: Number of MCTS simulations per search
             c_puct: Exploration constant for UCB1 formula
             device: Device to run neural network on ('cuda' or 'cpu')
+            timeout: Optional timeout in seconds for search (None for no timeout)
         """
         self.neural_net = neural_net
         self.num_simulations = num_simulations
         self.c_puct = c_puct
         self.device = device
+        self.timeout = timeout
         
         # Set neural network to evaluation mode
         self.neural_net.eval()
     
-    def search(self, root_position: Position) -> np.ndarray:
+    def search(self, root_position: Position, fallback_on_timeout: bool = True) -> np.ndarray:
         """Run MCTS from root position and return policy.
         
         Args:
             root_position: Starting position for search
+            fallback_on_timeout: If True, return neural network policy on timeout
             
         Returns:
             Policy vector of shape (4096,) with move probabilities
+            
+        Raises:
+            SearchTimeoutError: If timeout occurs and fallback_on_timeout is False
         """
+        start_time = time.time()
+        
         # Create root node
         root = MCTSNode(root_position)
         
@@ -54,20 +67,50 @@ class MCTS:
             self._expand_node(root)
         
         # Run simulations
-        for _ in range(self.num_simulations):
-            # Selection: traverse tree to leaf
-            node = root
-            search_path = [node]
-            
-            while not node.is_leaf() and not node.position.is_terminal():
-                node = self._select_child(node)
-                search_path.append(node)
-            
-            # Evaluation: get value for leaf node
-            value = self._evaluate_node(node)
-            
-            # Backpropagation: update statistics along path
-            self._backpropagate(search_path, value)
+        simulations_completed = 0
+        try:
+            for sim in range(self.num_simulations):
+                # Check timeout
+                if self.timeout is not None:
+                    elapsed = time.time() - start_time
+                    if elapsed > self.timeout:
+                        logger.warning(
+                            f"MCTS search timed out after {elapsed:.2f}s "
+                            f"({simulations_completed}/{self.num_simulations} simulations)"
+                        )
+                        if fallback_on_timeout:
+                            # Fallback to neural network policy if we have some simulations
+                            if simulations_completed > 0:
+                                logger.info("Using partial MCTS results as fallback")
+                                return self._get_policy_from_visits(root)
+                            else:
+                                logger.info("Using neural network policy as fallback")
+                                return self._get_neural_network_policy(root_position)
+                        else:
+                            raise SearchTimeoutError(self.timeout, simulations_completed)
+                
+                # Selection: traverse tree to leaf
+                node = root
+                search_path = [node]
+                
+                while not node.is_leaf() and not node.position.is_terminal():
+                    node = self._select_child(node)
+                    search_path.append(node)
+                
+                # Evaluation: get value for leaf node
+                value = self._evaluate_node(node)
+                
+                # Backpropagation: update statistics along path
+                self._backpropagate(search_path, value)
+                
+                simulations_completed += 1
+        
+        except Exception as e:
+            logger.error(f"Error during MCTS search: {e}")
+            if fallback_on_timeout and simulations_completed > 0:
+                logger.info(f"Using partial results from {simulations_completed} simulations")
+                return self._get_policy_from_visits(root)
+            raise
         
         # Return policy based on visit counts
         return self._get_policy_from_visits(root)
@@ -206,6 +249,31 @@ class MCTS:
             policy = policy / total_visits
         
         return policy
+    
+    def _get_neural_network_policy(self, position: Position) -> np.ndarray:
+        """Get policy directly from neural network without MCTS.
+        
+        Used as fallback when MCTS times out or fails.
+        
+        Args:
+            position: Position to evaluate
+            
+        Returns:
+            Policy vector of shape (4096,) with move probabilities
+        """
+        try:
+            policy_probs, _ = self._evaluate_position(position)
+            return policy_probs
+        except Exception as e:
+            logger.error(f"Failed to get neural network policy: {e}")
+            # Ultimate fallback: uniform distribution over legal moves
+            policy = np.zeros(4096)
+            legal_moves = position.get_legal_moves()
+            if legal_moves:
+                for move in legal_moves:
+                    move_idx = MoveEncoder.encode_move(move)
+                    policy[move_idx] = 1.0 / len(legal_moves)
+            return policy
     
     def get_best_move(self, position: Position) -> Optional[chess.Move]:
         """Get the best move for a position.
