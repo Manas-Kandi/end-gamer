@@ -13,6 +13,7 @@ King-pawn endgames, despite involving only three pieces, contain rich strategic 
 - **Specialized Focus**: Optimized specifically for king-pawn endgames
 - **Scalable Framework**: Designed for extension to other chess endgames
 - **Comprehensive Evaluation**: Includes benchmarking against various opponents and tablebase verification
+- **Optional Tablebase Integration**: Supports Syzygy tablebases for perfect endgame evaluation
 
 ## Project Structure
 
@@ -84,6 +85,19 @@ For all optional dependencies:
 ```bash
 pip install -e ".[dev,distributed]"
 ```
+
+### Optional: Syzygy Tablebase Setup
+
+For enhanced evaluation with perfect endgame play:
+
+1. Download Syzygy tablebases from http://tablebase.sesse.net/syzygy/
+2. Set the tablebase path:
+   ```bash
+   export TABLEBASE_PATH=/path/to/tablebases
+   ```
+3. See `docs/tablebase_usage.md` for detailed setup and usage instructions
+
+Note: Tablebases are optional. The engine works without them using heuristic evaluation.
 
 ## Hardware Requirements
 

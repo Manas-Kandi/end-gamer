@@ -2,5 +2,6 @@
 
 from .test_suite import TestSuite, TestPosition
 from .evaluator import Evaluator
+from .tablebase import TablebaseInterface
 
-__all__ = ['TestSuite', 'TestPosition', 'Evaluator']
+__all__ = ['TestSuite', 'TestPosition', 'Evaluator', 'TablebaseInterface']

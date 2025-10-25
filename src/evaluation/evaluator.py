@@ -9,56 +9,26 @@ import random
 from collections import defaultdict
 
 from .test_suite import TestSuite, TestPosition, ExpectedResult, PositionDifficulty
+from .tablebase import TablebaseInterface
 from ..config.config import Config
 from ..mcts.mcts import MCTS
 from ..chess_env.position import Position
 from ..chess_env.move_encoder import MoveEncoder
 
 
-class TablebaseInterface:
-    """Interface for tablebase access (placeholder for optional integration)."""
-    
-    def __init__(self):
-        """Initialize tablebase interface."""
-        self.available = False
-    
-    def probe(self, position: Position) -> Optional[float]:
-        """Probe tablebase for position evaluation.
-        
-        Args:
-            position: Position to evaluate
-            
-        Returns:
-            Position value from tablebase perspective, or None if unavailable
-        """
-        # Placeholder - would integrate with Syzygy tablebases
-        return None
-    
-    def get_best_move(self, position: Position) -> Optional[chess.Move]:
-        """Get best move from tablebase.
-        
-        Args:
-            position: Position to analyze
-            
-        Returns:
-            Best move according to tablebase, or None if unavailable
-        """
-        # Placeholder - would integrate with Syzygy tablebases
-        return None
-
-
 class Evaluator:
     """Evaluate model performance against test positions and benchmarks."""
     
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, tablebase_path: Optional[str] = None):
         """Initialize evaluator.
         
         Args:
             config: Configuration object
+            tablebase_path: Optional path to Syzygy tablebase files
         """
         self.config = config
         self.test_suite = TestSuite.generate_standard_suite()
-        self.tablebase = TablebaseInterface()
+        self.tablebase = TablebaseInterface(tablebase_path)
         
         # Cache for repeated evaluations
         self._position_cache: Dict[str, float] = {}
@@ -159,9 +129,6 @@ class Evaluator:
         Returns:
             Move accuracy as percentage (0.0 to 1.0)
         """
-        # Since tablebase is not available, we'll use a simplified heuristic
-        # In a real implementation, this would compare with Syzygy tablebase
-        
         correct_moves = 0
         total = 0
         
@@ -176,8 +143,15 @@ class Evaluator:
             policy = mcts.search(test_pos.position)
             model_move = self._get_best_move_from_policy(policy, test_pos.position)
             
-            # Use simple heuristic for "optimal" move (placeholder for tablebase)
-            optimal_move = self._get_heuristic_best_move(test_pos.position)
+            # Try to get optimal move from tablebase, fallback to heuristic
+            if self.tablebase.is_available():
+                optimal_move = self.tablebase.get_best_move(test_pos.position)
+                if optimal_move is None:
+                    # Position not in tablebase, use heuristic
+                    optimal_move = self._get_heuristic_best_move(test_pos.position)
+            else:
+                # Tablebase not available, use heuristic
+                optimal_move = self._get_heuristic_best_move(test_pos.position)
             
             if model_move == optimal_move:
                 correct_moves += 1
@@ -220,7 +194,16 @@ class Evaluator:
                 result = -result
             return result
         else:
-            # Game didn't finish - use heuristic evaluation
+            # Game didn't finish - try tablebase, fallback to heuristic
+            if self.tablebase.is_available():
+                tb_result = self.tablebase.probe(current_pos)
+                if tb_result is not None:
+                    # Adjust result based on original turn
+                    if original_turn != current_pos.board.turn:
+                        tb_result = -tb_result
+                    return tb_result
+            
+            # Fallback to heuristic evaluation
             return self._heuristic_evaluation(current_pos)
     
     def _get_best_move_from_policy(self, policy: np.ndarray, position: Position) -> Optional[chess.Move]:

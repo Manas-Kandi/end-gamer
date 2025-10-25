@@ -205,7 +205,7 @@
   - Write unit tests for Elo calculation
   - _Requirements: 8.4, 8.10_
 
-- [ ] 11. Implement tablebase integration (optional)
+- [x] 11. Implement tablebase integration (optional)
   - Create TablebaseInterface for Syzygy tablebase access
   - Implement probe() for position evaluation
   - Implement get_best_move() for optimal move lookup
