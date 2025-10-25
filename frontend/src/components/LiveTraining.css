@@ -1,0 +1,169 @@
+.live-training {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.live-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.live-header h2 {
+  font-size: 1.75rem;
+  color: #fff;
+}
+
+.live-status {
+  display: flex;
+  gap: 1rem;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.status-badge.playing {
+  background: #10b981;
+  color: white;
+}
+
+.status-badge.waiting {
+  background: #6b7280;
+  color: white;
+}
+
+.live-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.board-info {
+  background: #2d2d2d;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.game-details {
+  background: #2d2d2d;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.game-details h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-section {
+  border-bottom: 1px solid #3d3d3d;
+  padding-bottom: 1rem;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+}
+
+.detail-section h4 {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.detail-item span:first-child {
+  color: #9ca3af;
+}
+
+.detail-item span:last-child,
+.detail-item code {
+  color: #fff;
+  font-weight: 500;
+}
+
+.detail-item code {
+  background: #1a1a1a;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.detail-item .positive {
+  color: #10b981;
+}
+
+.detail-item .negative {
+  color: #ef4444;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+}
+
+.no-data p {
+  margin-bottom: 0.5rem;
+}
+
+.no-data .hint {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@media (max-width: 1200px) {
+  .live-content {
+    grid-template-columns: 1fr;
+  }
+}

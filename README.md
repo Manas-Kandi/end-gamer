@@ -11,6 +11,9 @@ King-pawn endgames, despite involving only three pieces, contain rich strategic 
 - **AlphaZero-style Architecture**: Combines deep neural networks with Monte Carlo Tree Search (MCTS)
 - **Self-Play Training**: Learns optimal strategies without human-crafted knowledge
 - **Specialized Focus**: Optimized specifically for king-pawn endgames
+- **Real-Time Visualization**: Interactive web dashboard for monitoring training progress
+- **Live Game Viewer**: Watch training games unfold in real-time with MCTS statistics
+- **Game History Browser**: Browse and replay all training games with move-by-move analysis
 - **Scalable Framework**: Designed for extension to other chess endgames
 - **Comprehensive Evaluation**: Includes benchmarking against various opponents and tablebase verification
 - **Optional Tablebase Integration**: Supports Syzygy tablebases for perfect endgame evaluation
@@ -119,22 +122,54 @@ Note: Tablebases are optional. The engine works without them using heuristic eva
 
 ## Usage
 
+### Real-Time Training Visualization
+
+Launch the interactive web dashboard to monitor training in real-time:
+
+```bash
+# Quick start (starts both backend and frontend)
+./start_visualization.sh
+```
+
+Or start services separately:
+
+```bash
+# Terminal 1: Start backend API
+cd api
+python server.py
+
+# Terminal 2: Start frontend
+cd frontend
+npm install  # First time only
+npm run dev
+```
+
+Then open your browser to `http://localhost:3000` to access:
+- **Live Training Board**: Watch games being played in real-time
+- **Game History**: Browse and replay all completed games
+- **Metrics Dashboard**: View training progress with interactive charts
+- **Control Panel**: Start/stop training and adjust configurations
+
+See `docs/visualization_setup.md` for detailed setup instructions.
+
 ### Training a Model
 
 Start training with default configuration:
 ```bash
-chess-train --config configs/default.yaml
+python train.py --config configs/default.yaml
 ```
 
 Resume training from checkpoint:
 ```bash
-chess-train --config configs/default.yaml --resume checkpoints/checkpoint_50000.pt
+python train.py --config configs/default.yaml --resume checkpoints/checkpoint_50000.pt
 ```
 
 Quick test run with reduced parameters:
 ```bash
-chess-train --config configs/quick_test.yaml
+python train.py --config configs/quick_test.yaml
 ```
+
+Or start training from the web dashboard Control Panel.
 
 ### Evaluating a Model
 
