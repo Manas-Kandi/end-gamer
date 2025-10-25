@@ -99,7 +99,7 @@ class MetricsLogger:
         """
         if step is None:
             step = self.training_step
-            self.training_step += 1
+        self.training_step += 1
         
         # Log each loss individually
         for loss_name, loss_value in losses.items():
@@ -125,7 +125,7 @@ class MetricsLogger:
         """
         if step is None:
             step = self.evaluation_step
-            self.evaluation_step += 1
+        self.evaluation_step += 1
         
         # Log each metric individually
         for metric_name, metric_value in metrics.items():

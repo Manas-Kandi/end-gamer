@@ -152,8 +152,8 @@
   - Write integration tests for complete training iteration
   - _Requirements: 3.3, 3.4, 3.5, 6.8, 12.4, 12.5_
 
-- [ ] 9. Implement logging and monitoring
-- [ ] 9.1 Create MetricsLogger class
+- [x] 9. Implement logging and monitoring
+- [x] 9.1 Create MetricsLogger class
   - Implement initialization with TensorBoard SummaryWriter
   - Implement log_scalar() for single metric logging
   - Implement log_losses() for training loss logging
@@ -162,7 +162,7 @@
   - Write unit tests for logging functionality
   - _Requirements: 13.1, 13.2, 13.6, 13.7_
 
-- [ ] 9.2 Integrate resource monitoring
+- [x] 9.2 Integrate resource monitoring
   - Implement GPU memory usage tracking
   - Implement CPU utilization tracking
   - Implement MCTS statistics logging (nodes per second)

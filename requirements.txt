@@ -35,3 +35,6 @@ tqdm>=4.65.0
 
 # Scientific Computing
 scipy>=1.10.0
+
+# System Monitoring
+psutil>=5.9.0
