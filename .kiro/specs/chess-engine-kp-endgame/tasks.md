@@ -169,8 +169,8 @@
   - Log metrics at appropriate intervals
   - _Requirements: 13.4, 13.5, 11.9_
 
-- [ ] 10. Implement evaluation framework
-- [ ] 10.1 Create test position suite
+- [x] 10. Implement evaluation framework
+- [x] 10.1 Create test position suite
   - Create TestSuite dataclass for organizing test positions
   - Implement generate_standard_suite() with classic king-pawn positions
   - Include easy positions (pawn far advanced)
@@ -180,7 +180,7 @@
   - Write unit tests for test suite generation
   - _Requirements: 9.6, 9.7, 9.8, 9.9_
 
-- [ ] 10.2 Create Evaluator class for performance measurement
+- [x] 10.2 Create Evaluator class for performance measurement
   - Implement evaluate() running comprehensive evaluation
   - Implement _evaluate_win_rate() testing winning positions
   - Implement _evaluate_draw_rate() testing drawn positions
@@ -190,7 +190,7 @@
   - Write unit tests for evaluation methods
   - _Requirements: 8.1, 8.2, 8.3, 9.10_
 
-- [ ] 10.3 Implement benchmark opponents
+- [x] 10.3 Implement benchmark opponents
   - Create RandomPlayer class for sanity check baseline
   - Create SimpleHeuristicPlayer using material counting
   - Create MinimaxPlayer with configurable depth
@@ -198,7 +198,7 @@
   - Write unit tests for opponent implementations
   - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 10.4 Implement Elo estimation
+- [x] 10.4 Implement Elo estimation
   - Implement _estimate_elo() playing matches against calibrated opponents
   - Implement _calculate_elo_from_results() computing Elo from match results
   - Integrate with Evaluator class
