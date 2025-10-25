@@ -213,27 +213,27 @@
   - Write unit tests with mock tablebase
   - _Requirements: 5.5, 8.3, 9.5_
 
-- [ ] 12. Create command-line interface
-- [ ] 12.1 Create train.py script
+- [x] 12. Create command-line interface
+- [x] 12.1 Create train.py script
   - Implement argument parsing for config file and resume checkpoint
   - Implement training initialization and execution
   - Implement signal handling for graceful shutdown
   - Add logging and progress display
   - _Requirements: 16.3_
 
-- [ ] 12.2 Create evaluate.py script
+- [x] 12.2 Create evaluate.py script
   - Implement argument parsing for model path and test suite
   - Load trained model and run evaluation
   - Display and save evaluation results
   - _Requirements: 16.4_
 
-- [ ] 12.3 Create play.py script for interactive play
+- [x] 12.3 Create play.py script for interactive play
   - Implement argument parsing for model path and player color
   - Create interactive game loop
   - Display board and move suggestions
   - _Requirements: 16.3_
 
-- [ ] 12.4 Create analyze.py script for position analysis
+- [x] 12.4 Create analyze.py script for position analysis
   - Implement argument parsing for model path and FEN string
   - Display position evaluation and top moves
   - Show MCTS search statistics
