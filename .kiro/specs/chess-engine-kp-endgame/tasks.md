@@ -130,8 +130,8 @@
   - Write integration tests for parallel generation
   - _Requirements: 3.6_
 
-- [ ] 8. Implement training pipeline
-- [ ] 8.1 Create Trainer class
+- [x] 8. Implement training pipeline
+- [x] 8.1 Create Trainer class
   - Implement initialization with neural network and optimizer (Adam)
   - Implement learning rate scheduler (StepLR)
   - Implement train_step() performing one gradient update
@@ -141,7 +141,7 @@
   - Write unit tests for training step
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
-- [ ] 8.2 Create TrainingOrchestrator class
+- [x] 8.2 Create TrainingOrchestrator class
   - Implement initialization with config, neural network, trainer, replay buffer
   - Implement train() main training loop
   - Implement _generate_self_play_games() coordinating parallel workers
