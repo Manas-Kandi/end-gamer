@@ -6,6 +6,8 @@ import asyncio
 import random
 from datetime import datetime
 import chess
+import json
+from pathlib import Path
 
 app = FastAPI(title="Chess Training Visualizer API (Demo Mode)")
 
@@ -17,6 +19,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Storage configuration
+GAMES_DIR = Path("data/games")
+GAMES_DIR.mkdir(parents=True, exist_ok=True)
+GAMES_PER_FILE = 100
 
 # Demo state
 demo_state = {
@@ -31,6 +38,67 @@ demo_state = {
         "curriculum_level": 0
     }
 }
+
+
+def load_all_games():
+    """Load all games from disk on startup."""
+    games = []
+    game_files = sorted(GAMES_DIR.glob("games_*.json"))
+    
+    for game_file in game_files:
+        try:
+            with open(game_file, 'r') as f:
+                batch = json.load(f)
+                games.extend(batch)
+        except Exception as e:
+            print(f"Error loading {game_file}: {e}")
+    
+    return games
+
+
+def save_game(game_data):
+    """Save a game to disk, creating new file every 100 games."""
+    demo_state["game_history"].append(game_data)
+    
+    # Determine which file this game belongs to
+    game_id = game_data["id"]
+    file_index = game_id // GAMES_PER_FILE
+    file_path = GAMES_DIR / f"games_{file_index:04d}.json"
+    
+    # Load existing games in this batch
+    if file_path.exists():
+        with open(file_path, 'r') as f:
+            batch = json.load(f)
+    else:
+        batch = []
+    
+    # Add new game
+    batch.append(game_data)
+    
+    # Save batch
+    with open(file_path, 'w') as f:
+        json.dump(batch, f, indent=2)
+    
+    print(f"Saved game {game_id} to {file_path}")
+
+
+def load_games_range(offset, limit):
+    """Load games from disk with pagination."""
+    all_games = load_all_games()
+    total = len(all_games)
+    
+    # Return most recent games first
+    games_reversed = list(reversed(all_games))
+    games_slice = games_reversed[offset:offset + limit]
+    
+    return games_slice, total
+
+
+# Load existing games on startup
+print("Loading existing games from disk...")
+demo_state["game_history"] = load_all_games()
+demo_state["metrics"]["total_games"] = len(demo_state["game_history"])
+print(f"Loaded {len(demo_state['game_history'])} games")
 
 # WebSocket connections
 active_connections = []
@@ -97,9 +165,8 @@ async def stop_training():
 
 @app.get("/api/games")
 async def get_games(limit: int = 50, offset: int = 0):
-    games = demo_state["game_history"]
-    total = len(games)
-    games_slice = list(reversed(games))[offset:offset + limit]
+    # Load games from disk for pagination
+    games_slice, total = load_games_range(offset, limit)
     
     return {
         "games": games_slice,
@@ -111,10 +178,15 @@ async def get_games(limit: int = 50, offset: int = 0):
 
 @app.get("/api/games/{game_id}")
 async def get_game(game_id: int):
-    if game_id < 0 or game_id >= len(demo_state["game_history"]):
-        return {"error": "Game not found"}, 404
+    # Load all games to find specific one
+    all_games = load_all_games()
     
-    return demo_state["game_history"][game_id]
+    # Find game by ID
+    for game in all_games:
+        if game["id"] == game_id:
+            return game
+    
+    return {"error": "Game not found"}, 404
 
 
 @app.get("/api/metrics")
@@ -142,13 +214,39 @@ async def websocket_endpoint(websocket: WebSocket):
 
 async def run_demo_training():
     """Simulate training with fake data."""
-    print("🎮 Starting demo training...")
+    print("Starting demo training...")
     
     while demo_state["is_training"]:
         # Simulate a game
-        game_id = len(demo_state["game_history"])
-        moves = generate_random_game()
-        result = random.choice([1.0, 0.0, -1.0])
+        game_id = demo_state["metrics"]["total_games"]
+        moves, final_board = generate_random_game()
+        
+        # Determine actual result from final position
+        if final_board.is_checkmate():
+            # Winner is the side that just moved (opponent is checkmated)
+            result = 1.0 if not final_board.turn else -1.0
+            outcome = "checkmate"
+            winner = "white" if result == 1.0 else "black"
+        elif final_board.is_stalemate():
+            result = 0.0
+            outcome = "stalemate"
+            winner = "draw"
+        elif final_board.is_insufficient_material():
+            result = 0.0
+            outcome = "insufficient_material"
+            winner = "draw"
+        elif final_board.is_fifty_moves():
+            result = 0.0
+            outcome = "fifty_move_rule"
+            winner = "draw"
+        elif final_board.can_claim_threefold_repetition():
+            result = 0.0
+            outcome = "threefold_repetition"
+            winner = "draw"
+        else:
+            result = 0.0
+            outcome = "incomplete"
+            winner = "draw"
         
         game_data = {
             "id": game_id,
@@ -156,10 +254,13 @@ async def run_demo_training():
             "moves": moves,
             "result": result,
             "num_moves": len(moves),
-            "positions": []
+            "positions": [],
+            "outcome": outcome,
+            "winner": winner
         }
         
-        demo_state["game_history"].append(game_data)
+        # Save game to disk
+        save_game(game_data)
         
         # Update metrics
         demo_state["metrics"]["total_games"] += 1
@@ -217,36 +318,67 @@ async def run_demo_training():
         # Wait before next game
         await asyncio.sleep(2)
         
-        print(f"✅ Demo game {game_id} completed ({len(moves)} moves, result: {result})")
+        print(f"Game {game_id} completed ({len(moves)} moves, result: {result})")
 
 
 def generate_random_game():
-    """Generate a random chess game."""
+    """Generate a random chess game that plays until completion."""
     board = chess.Board()
     moves = []
+    moves_since_capture = 0
     
-    max_moves = random.randint(20, 60)
-    
-    for _ in range(max_moves):
-        if board.is_game_over():
+    # Play until game is decisively over
+    while True:
+        # Check for terminal conditions
+        if board.is_checkmate() or board.is_stalemate() or board.is_insufficient_material():
+            break
+        
+        # Check for draw by repetition or 50-move rule
+        if board.is_fifty_moves() or board.can_claim_threefold_repetition():
             break
         
         legal_moves = list(board.legal_moves)
         if not legal_moves:
             break
         
-        move = random.choice(legal_moves)
+        # Prefer captures and checks to make games more decisive
+        captures = [m for m in legal_moves if board.is_capture(m)]
+        checks = [m for m in legal_moves if board.gives_check(m)]
+        
+        # 70% chance to prefer captures/checks if available
+        if (captures or checks) and random.random() < 0.7:
+            preferred_moves = captures + checks
+            move = random.choice(preferred_moves)
+        else:
+            move = random.choice(legal_moves)
+        
+        # Track if this was a capture
+        was_capture = board.is_capture(move)
+        
         moves.append(move.uci())
         board.push(move)
+        
+        # Reset counter on capture or pawn move
+        if was_capture or board.piece_at(move.to_square).piece_type == chess.PAWN:
+            moves_since_capture = 0
+        else:
+            moves_since_capture += 1
+        
+        # Safety limits
+        if len(moves) > 300:  # Absolute maximum
+            break
+        if moves_since_capture > 50:  # Too many moves without progress
+            break
     
-    return moves
+    return moves, board
 
 
 if __name__ == "__main__":
     import uvicorn
-    print("🎮 Starting Chess Training Visualizer in DEMO MODE")
     print("=" * 60)
-    print("This server generates fake training data for testing")
-    print("Real training integration coming soon!")
+    print("Chess Training Visualizer - Demo Mode")
+    print("=" * 60)
+    print(f"Games directory: {GAMES_DIR.absolute()}")
+    print(f"Loaded {len(demo_state['game_history'])} existing games")
     print("=" * 60)
     uvicorn.run(app, host="0.0.0.0", port=8000)
