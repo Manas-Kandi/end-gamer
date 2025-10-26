@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import LiveTraining from './components/LiveTraining'
+import PositionTraining from './components/PositionTraining'
 import GameHistory from './components/GameHistory'
 import MetricsDashboard from './components/MetricsDashboard'
 import ControlPanel from './components/ControlPanel'
@@ -83,10 +84,10 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🏆 Chess Training Visualizer</h1>
+        <h1>CHESS TRAINING</h1>
         <div className="status-indicator">
           <span className={`status-dot ${trainingStatus?.is_training ? 'active' : 'inactive'}`}></span>
-          <span>{trainingStatus?.is_training ? 'Training Active' : 'Idle'}</span>
+          <span>{trainingStatus?.is_training ? 'ACTIVE' : 'IDLE'}</span>
         </div>
       </header>
 
@@ -97,25 +98,31 @@ function App() {
               className={`nav-tab ${activeTab === 'live' ? 'active' : ''}`}
               onClick={() => setActiveTab('live')}
             >
-              📡 Live Training
+              Live Training
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'position' ? 'active' : ''}`}
+              onClick={() => setActiveTab('position')}
+            >
+              Position Training
             </button>
             <button 
               className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
               onClick={() => setActiveTab('history')}
             >
-              📚 Game History
+              History
             </button>
             <button 
               className={`nav-tab ${activeTab === 'metrics' ? 'active' : ''}`}
               onClick={() => setActiveTab('metrics')}
             >
-              📊 Metrics
+              Metrics
             </button>
             <button 
               className={`nav-tab ${activeTab === 'control' ? 'active' : ''}`}
               onClick={() => setActiveTab('control')}
             >
-              ⚙️ Control Panel
+              Control
             </button>
           </nav>
 
@@ -152,6 +159,7 @@ function App() {
 
         <main className="main-content">
           {activeTab === 'live' && <LiveTraining ws={ws} />}
+          {activeTab === 'position' && <PositionTraining />}
           {activeTab === 'history' && <GameHistory />}
           {activeTab === 'metrics' && <MetricsDashboard metrics={metrics} />}
           {activeTab === 'control' && <ControlPanel onStatusChange={fetchStatus} />}
