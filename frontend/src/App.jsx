@@ -16,32 +16,38 @@ function App() {
     fetchStatus()
 
     // Setup WebSocket connection
-    const websocket = new WebSocket('ws://localhost:8000/ws')
-    
-    websocket.onopen = () => {
-      console.log('WebSocket connected')
-      setWs(websocket)
+    const connectWebSocket = () => {
+      const websocket = new WebSocket('ws://localhost:8000/ws')
+      
+      websocket.onopen = () => {
+        console.log('WebSocket connected')
+        setWs(websocket)
+      }
+
+      websocket.onmessage = (event) => {
+        const message = JSON.parse(event.data)
+        handleWebSocketMessage(message)
+      }
+
+      websocket.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
+
+      websocket.onclose = () => {
+        console.log('WebSocket disconnected, reconnecting...')
+        // Attempt to reconnect after 3 seconds (without reloading page)
+        setTimeout(() => {
+          connectWebSocket()
+        }, 3000)
+      }
+
+      return websocket
     }
 
-    websocket.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      handleWebSocketMessage(message)
-    }
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error)
-    }
-
-    websocket.onclose = () => {
-      console.log('WebSocket disconnected')
-      // Attempt to reconnect after 3 seconds
-      setTimeout(() => {
-        window.location.reload()
-      }, 3000)
-    }
+    const websocket = connectWebSocket()
 
     return () => {
-      if (websocket) {
+      if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.close()
       }
     }
